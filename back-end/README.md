@@ -14,6 +14,18 @@ app/
 tests/            # Tests
 ```
 
+## Migrations (Alembic)
+
+1. Generate a new migration revision:
+   ```bash
+   alembic revision --autogenerate -m "Initial migration"
+   ```
+
+2. Apply migrations to the database:
+   ```bash
+   alembic upgrade head
+   ```
+
 ## Getting Started
 
 1. Create a virtual environment:
