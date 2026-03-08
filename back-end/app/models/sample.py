@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from app.db.base import Base
+from app.db.base import Base, AuditModel
 
-class Sample(Base):
+class Sample(Base, AuditModel):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     description = Column(String, index=True)
