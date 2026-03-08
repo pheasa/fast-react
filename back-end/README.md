@@ -46,5 +46,5 @@ tests/            # Tests
 
 4. Access the API:
    - Root: http://127.0.0.1:8000/
-   - API V1 Items: http://127.0.0.1:8000/api/v1/items
+   - API V1 Samples: http://127.0.0.1:8000/api/v1/samples
    - Documentation (Swagger UI): http://127.0.0.1:8000/docs

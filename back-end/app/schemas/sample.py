@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
-class Item(BaseModel):
+class Sample(BaseModel):
     id: int
     title: str
