@@ -1,6 +1,7 @@
 from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel
+from app.schemas.user import User
 
 class SampleBase(BaseModel):
     title: Optional[str] = None
@@ -23,6 +24,11 @@ class Sample(SampleBase):
     deleted_by: Optional[int] = None
     is_deleted: bool = False
     status: bool = True
+    
+    # Audit Relationships
+    creator: Optional[User] = None
+    updater: Optional[User] = None
+    deleter: Optional[User] = None
 
     class Config:
         from_attributes = True

@@ -2,13 +2,14 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.db.base import Base
+from app.models.user import User
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(self, model: Type[ModelType]):
+    def __init__(self, model: Type[ModelType], user: User, db: Session):
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).
 
@@ -18,26 +19,47 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         * `schema`: A Pydantic model (schema) class
         """
         self.model = model
+        self.user = user
+        self.db = db
 
-    def get(self, db: Session, id: Any) -> Optional[ModelType]:
-        return db.query(self.model).filter(self.model.id == id).first()
-
+    def get(self, id: int) -> Optional[ModelType]:
+        """
+        Use .first() after call this function to get the result.
+        """
+        return self.db.query(self.model).filter(self.model.id == id, self.model.is_deleted.is_(False))
+    
+    def get_by_creator(self, id: int) -> Optional[ModelType]:
+        """
+        Use .first() after call this function to get the result.
+        """
+        return self.db.query(self.model).filter(self.model.id == id, self.model.is_deleted.is_(False), self.model.created_by == self.user.id)
+    
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+        self, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
-        return db.query(self.model).offset(skip).limit(limit).all()
+        """
+        Use .all() after call this function to get the result.
+        """
+        return self.db.query(self.model).filter(self.model.is_deleted.is_(False)).offset(skip).limit(limit)
+    
+    def get_multi_by_creator(
+        self, *, skip: int = 0, limit: int = 100
+    ) -> List[ModelType]:
+        """
+        Use .all() after call this function to get the result.
+        """
+        return self.db.query(self.model).filter(self.model.is_deleted.is_(False), self.model.created_by == self.user.id).offset(skip).limit(limit)
 
-    def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
+    def create(self, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = obj_in.model_dump()
         db_obj = self.model(**obj_in_data)
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        db_obj.creator = self.user
+        self.db.add(db_obj)
+        self.db.refresh(db_obj)
         return db_obj
 
     def update(
         self,
-        db: Session,
         *,
         db_obj: ModelType,
         obj_in: Union[UpdateSchemaType, Dict[str, Any]]
@@ -49,13 +71,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for field in update_data:
             if hasattr(db_obj, field):
                 setattr(db_obj, field, update_data[field])
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        self.db_obj.updater = self.user
+        self.db.add(db_obj)
+        self.db.refresh(db_obj)
         return db_obj
 
-    def remove(self, db: Session, *, id: int) -> ModelType:
-        obj = db.query(self.model).get(id)
-        db.delete(obj)
-        db.commit()
+    def delete(self, *, id: int) -> ModelType:
+        obj = self.db.query(self.model).get(id)
+        obj.is_deleted = True
+        obj.deleter = self.user
         return obj
+    
+    def commit(self):
+        self.db.commit()

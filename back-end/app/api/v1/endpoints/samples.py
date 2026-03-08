@@ -111,5 +111,5 @@ def delete_sample(
     sample = crud_sample.sample.get(db, id=id)
     if not sample:
         raise HTTPException(status_code=404, detail="Sample not found")
-    sample = crud_sample.sample.remove(db, id=id)
+    sample = crud_sample.sample.delete(db, id=id)
     return BaseResponse(data=sample)
