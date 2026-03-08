@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./back-end
+    container_name: back-end
+    volumes:
+      - ./back-end:/app
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+      - "5678:5678" # Debug port for ptvsd
+    networks:
+      - my-network
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+
+  frontend:
+    build: ./front-end
+    container_name: front-end
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./front-end:/app
+      - /app/node_modules
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    networks:
+      - my-network
+    restart: unless-stopped
+
+networks:
+  my-network:
+    driver: bridge
