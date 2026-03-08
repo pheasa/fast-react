@@ -72,7 +72,13 @@ def list_samples(
             "description": f"Desc {i}", 
             "is_active": True,
             "created_at": now,
-            "updated_at": now
+            "updated_at": now,
+            "created_by": 1,
+            "updated_by": 1,
+            "deleted_at": None,
+            "deleted_by": None,
+            "is_deleted": False,
+            "status": True
         } for i in range(1, 51)]
     
     paginated_data = paginate(all_samples, page, limit)
