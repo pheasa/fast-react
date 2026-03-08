@@ -2,11 +2,12 @@ from fastapi import APIRouter, Query, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Any
 from datetime import datetime
+from app.crud.crud_sample import CRUDSample
+from app.models.user import User
 from app.schemas.sample import Sample, SampleCreate, SampleUpdate
 from app.schemas.response import BaseResponse, PaginatedResponse
 from app.services.pagination import paginate
 from app.api import deps
-from app.crud import crud_sample
 
 router = APIRouter()
 
@@ -19,9 +20,10 @@ def read_samples(
     """
     Retrieve samples.
     """
-    samples = crud_sample.sample.get_multi(db, skip=skip, limit=limit)
+    crud_sample = CRUDSample(db, User())
+    samples = crud_sample.get_multi(skip=skip, limit=limit).all()
     return BaseResponse(data=samples)
-
+    
 @router.post("/", response_model=BaseResponse[Sample])
 def create_sample(
     *,
@@ -31,7 +33,9 @@ def create_sample(
     """
     Create new sample.
     """
-    sample = crud_sample.sample.create(db, obj_in=sample_in)
+    crud_sample = CRUDSample(db, User())
+    sample = crud_sample.create(obj_in=sample_in)
+    sample = crud_sample.commit().refresh(sample)
     return BaseResponse(data=sample)
 
 @router.put("/{id}", response_model=BaseResponse[Sample])
@@ -44,10 +48,11 @@ def update_sample(
     """
     Update a sample.
     """
-    sample = crud_sample.sample.get(db, id=id)
+    crud_sample = CRUDSample(db, User())
+    sample = crud_sample.get(db, id=id).first()
     if not sample:
         raise HTTPException(status_code=404, detail="Sample not found")
-    sample = crud_sample.sample.update(db, db_obj=sample, obj_in=sample_in)
+    sample = crud_sample.update(db, db_obj=sample, obj_in=sample_in)
     return BaseResponse(data=sample)
 
 @router.get("/list", response_model=PaginatedResponse[Sample])
@@ -59,9 +64,10 @@ def list_samples(
     """
     Retrieve samples with pagination.
     """
+    crud_sample = CRUDSample(db, User())
     # For now, we still use the paginate utility which expects a list.
     # In a real app, you might want a paginate_db utility that uses SQL offset/limit.
-    all_samples = crud_sample.sample.get_multi(db, skip=0, limit=1000) # Simple fetch for demo
+    all_samples = crud_sample.get_multi(skip=0, limit=1000) # Simple fetch for demo
     
     # If no data in DB, use dummy data for demonstration
     if not all_samples:
@@ -94,7 +100,8 @@ def read_sample(
     """
     Get sample by ID.
     """
-    sample = crud_sample.sample.get(db, id=id)
+    crud_sample = CRUDSample(db, User())
+    sample = crud_sample.get(db, id=id)
     if not sample:
         raise HTTPException(status_code=404, detail="Sample not found")
     return BaseResponse(data=sample)
@@ -108,8 +115,9 @@ def delete_sample(
     """
     Delete a sample.
     """
-    sample = crud_sample.sample.get(db, id=id)
+    crud_sample = CRUDSample(db, User())
+    sample = crud_sample.get(db, id=id).first()
     if not sample:
         raise HTTPException(status_code=404, detail="Sample not found")
-    sample = crud_sample.sample.delete(db, id=id)
+    sample = crud_sample.delete(db, id=id)
     return BaseResponse(data=sample)

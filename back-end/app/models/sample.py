@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from app.db.base import Base, AuditModel
+from app.db.base import Base
+from app.models.audit import AuditModel
 
 class Sample(Base, AuditModel):
     id = Column(Integer, primary_key=True, index=True)

@@ -9,7 +9,7 @@ CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(self, model: Type[ModelType], user: User, db: Session):
+    def __init__(self,db: Session, user: User, model: Type[ModelType]):
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).
 
@@ -22,13 +22,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.user = user
         self.db = db
 
-    def get(self, id: int) -> Optional[ModelType]:
+    def get(self, id: int) -> ModelType:
         """
         Use .first() after call this function to get the result.
         """
         return self.db.query(self.model).filter(self.model.id == id, self.model.is_deleted.is_(False))
     
-    def get_by_creator(self, id: int) -> Optional[ModelType]:
+    def get_by_creator(self, id: int) -> ModelType:
         """
         Use .first() after call this function to get the result.
         """
@@ -55,7 +55,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_obj = self.model(**obj_in_data)
         db_obj.creator = self.user
         self.db.add(db_obj)
-        self.db.refresh(db_obj)
         return db_obj
 
     def update(
@@ -73,7 +72,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 setattr(db_obj, field, update_data[field])
         self.db_obj.updater = self.user
         self.db.add(db_obj)
-        self.db.refresh(db_obj)
         return db_obj
 
     def delete(self, *, id: int) -> ModelType:
@@ -84,3 +82,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     
     def commit(self):
         self.db.commit()
+        return self
+
+    def refresh(self, db_obj: ModelType) -> ModelType:
+        self.db.refresh(db_obj)
+        return db_obj
