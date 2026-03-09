@@ -1,22 +1,27 @@
 import { defineConfig, loadEnv } from 'vite'
+import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   
   return {
-    enableReactRefresh: false, // Disable React Fast Refresh for better ngrok compatibility
+    plugins: [react()],
     server: {
       proxy: {
+        // Only proxy /api calls to the backend
         "/api": {
-          target: env.API_URL,
+          target: env.VITE_API_BASE_URL || "http://localhost:3000",
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/api/, ""), // remove /api prefix
+          rewrite: (path) => path.replace(/^\/api/, ""),
         },
       },
-      allowedHosts: env.ALLOWED_HOSTS?.split(",") ?? [], // ← paste your current ngrok host
-      host: true, // allow external access
+      allowedHosts: true,
+      host: true,
     },
+    optimizeDeps: {
+      force: true,
+    }
   };
 });

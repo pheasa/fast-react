@@ -3,15 +3,7 @@
  *
  * Utility to safely access environment variables in a Vite project.
  * Supports both development and production environments.
- *
- * Notes:
- * - ALLOWED_HOSTS can be set in `.env` without a prefix.
- * - No need to touch `vite.config.ts`.
- * - Automatically splits comma-separated values for array use.
- * - Safe defaults provided if env variable is missing.
  */
-
-import { loadEnv } from "vite";
 
 interface EnvConfig {
   /** Current environment mode (development, production, etc.) */
@@ -23,24 +15,24 @@ interface EnvConfig {
   /** Flag for production mode */
   isProd: boolean;
 
+  /** API Base URL */
+  apiBaseUrl: string;
+
   /** List of allowed hosts (from .env ALLOWED_HOSTS) */
   allowHosts: string[];
 }
-
-// Load environment variables from .env files
-// - mode: development | production
-// - process.cwd(): project root
-// - "" : load all variables, no prefix required
-const envVars = loadEnv(import.meta.env.MODE, process.cwd(), "");
 
 export const env: EnvConfig = {
   mode: import.meta.env.MODE,
   isDev: import.meta.env.DEV,
   isProd: import.meta.env.PROD,
+  
+  // Use /api to benefit from the Vite proxy setup
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
 
-  // ALLOWED_HOSTS can be comma-separated in .env
-  // Defaults to empty array if not set
-  allowHosts: envVars.ALLOWED_HOSTS?.split(",") ?? [],
+  // For client-side, we must use VITE_ prefix if we want them here, 
+  // or they must be exported by Vite via import.meta.env
+  allowHosts: (import.meta.env.VITE_ALLOWED_HOSTS as string)?.split(","),
 };
 
 export default env;
