@@ -73,3 +73,14 @@ export default defineConfig([
   },
 ])
 ```
+
+## Environment Variables
+
+The following environment variables are used in the front-end:
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `REACT_APP_API_URL` | The URL of the API server. Used for proxying `/api` requests in development. | - |
+| `REACT_ALLOWED_HOSTS` | Comma-separated list of allowed hosts for the development server (e.g., for ngrok). | `[]` |
+
+Note: These variables are used in `vite.config.ts`. The `envPrefix` is configured as `APP_`, but the variables above are currently accessed via `process.env` during the Vite configuration phase.
