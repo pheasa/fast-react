@@ -15,15 +15,17 @@ interface EnvConfig {
 
   /** define key to using in project */
   appTitle: string;
+  apiBaseUrl: string;
 }
 
 export const env: EnvConfig = {
   mode: import.meta.env.MODE,
   isDev: import.meta.env.DEV,
   isProd: import.meta.env.PROD,
-  
+
   // For client-side, we must use APP_ prefix if we want them here.
-  appTitle: import.meta.env.APP_TITLE,
+  appTitle: import.meta.env.APP_TITLE || "Fast React App",
+  apiBaseUrl: import.meta.env.APP_API_BASE_URL || undefined,
 };
 
 export default env;
