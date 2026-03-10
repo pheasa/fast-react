@@ -30,6 +30,9 @@ const TestPage: React.FC = () => {
 
   return (
     <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
+      <h1 className="text-4xl font-bold text-blue-500 text-center">
+        Tailwind v4 Working
+      </h1>
       <h1>Backend Request Test</h1>
       
       <div style={{ marginBottom: "1rem", padding: "1rem", border: "1px solid #ccc", borderRadius: "8px" }}>
