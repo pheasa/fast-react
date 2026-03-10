@@ -11,17 +11,17 @@ export default defineConfig(({ mode }) => {
       proxy: {
         // Only proxy /api calls to the backend
         "/api": {
-          target: env.VITE_API_BASE_URL || "http://localhost:3000",
+          target: env.API_BASE_URL ?? "",
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ""),
         },
       },
-      allowedHosts: true,
+      allowedHosts: env.ALLOWED_HOSTS ? env.ALLOWED_HOSTS.split(",") : [],
       host: true,
     },
     optimizeDeps: {
       force: true,
-    }
+    },
   };
 });

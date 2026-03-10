@@ -80,11 +80,11 @@ The following environment variables are used in the front-end:
 
 | Variable | Description | Default |
 | --- | --- | --- |
-| `API_URL` | The URL of the API server. Used for proxying `/api` requests in development. | - |
+| `API_BASE_URL` | The URL of the API server. Used for proxying `/api` requests in development. | - |
 | `ALLOWED_HOSTS` | Comma-separated list of allowed hosts for the development server (e.g., for ngrok). | `[]` |
 
 example
 `
-API_URL=http://backend:8000
+API_BASE_URL=http://backend:8000
 ALLOWED_HOSTS=localhost,127.0.0.1
 `
