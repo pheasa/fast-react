@@ -1,0 +1,20 @@
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.layout-content {
+  flex: 1;
+  padding: 1rem;
+  padding-bottom: 76px; /* 60px height of nav + 16px padding */
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .layout-content {
+    max-width: 768px;
+  }
+}

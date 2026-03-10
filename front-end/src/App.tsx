@@ -31,8 +31,11 @@ function App() {
       <div style={{ marginTop: "2rem", padding: "1rem", backgroundColor: "#333", borderRadius: "8px" }}>
         <h2>Architecture Test</h2>
         <p>Click below to test the connection to your backend:</p>
-        <Link to="/test" style={{ color: "#646cff", fontWeight: "bold", fontSize: "1.2rem" }}>
+        <Link to="/test" style={{ color: "#646cff", fontWeight: "bold", fontSize: "1.2rem", display: "block", marginBottom: "1rem" }}>
           Go to Backend Test Page
+        </Link>
+        <Link to="/mobile" style={{ color: "#10b981", fontWeight: "bold", fontSize: "1.2rem" }}>
+          Go to Mobile Layout
         </Link>
       </div>
 
