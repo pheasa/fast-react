@@ -7,6 +7,8 @@ import HomePage from "../pages/HomePage";
 import SearchPage from "../pages/SearchPage";
 import ProfilePage from "../pages/ProfilePage";
 import SettingsPage from "../pages/SettingsPage";
+import LoginPage from "../pages/LoginPage";
+import RequireAuth from "../components/auth/RequireAuth";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: "/test",
     element: <TestPage />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
   },
   {
     element: <MainLayout />,
@@ -34,7 +40,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/settings",
-        element: <SettingsPage />,
+        element: (
+          <RequireAuth>
+            <SettingsPage />
+          </RequireAuth>
+        ),
       },
     ],
   },
